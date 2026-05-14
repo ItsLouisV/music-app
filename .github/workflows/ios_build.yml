@@ -23,8 +23,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Disable Code Signing
+      - name: Force Disable Code Signing
         run: |
+          # Gán Team ID giả để lừa Flutter pre-flight check
+          sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = XYZ1234567;/g' ios/Runner.xcodeproj/project.pbxproj
+          # Nếu chưa có dòng DEVELOPMENT_TEAM, chèn nó vào sau PRODUCT_BUNDLE_IDENTIFIER
+          grep -q "DEVELOPMENT_TEAM" ios/Runner.xcodeproj/project.pbxproj || sed -i '' '/PRODUCT_BUNDLE_IDENTIFIER/a\
+          DEVELOPMENT_TEAM = XYZ1234567;' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Tắt tất cả các yêu cầu về chữ ký
           sed -i '' 's/CODE_SIGNING_ALLOWED = YES/CODE_SIGNING_ALLOWED = NO/g' ios/Runner.xcodeproj/project.pbxproj
           sed -i '' 's/CODE_SIGNING_REQUIRED = YES/CODE_SIGNING_REQUIRED = NO/g' ios/Runner.xcodeproj/project.pbxproj
           sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' ios/Runner.xcodeproj/project.pbxproj
